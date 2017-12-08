@@ -1,1 +1,1 @@
-GD create a bakend
+#GangDou Create a Bakend* /list ok* / zero* /insert half* /delete zero####**We need a frontend and the list of database API**####**We need a tag in POST for each part of a sliced fle.**

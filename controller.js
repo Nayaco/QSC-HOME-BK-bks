@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path')
 
 addHandles = (router, handles) => {
     for (let url in handles) {
@@ -34,9 +35,31 @@ function addControllers(router, c_dir) {
     });
 }
 
+function addUploader(router){
+    console.log(`register URL handles: POST /insert`)
+    const multer = require('koa-multer')
+    const MyCustomStorage = require('./UploadMode')
+    let storage = MyCustomStorage({
+        destination:function (req,file,cb) {
+            let final_path = __dirname + '\\static\\' 
+            console.log(final_path)
+            cb(null,final_path)  
+        },
+        filename:function (req,file,cb){
+            let fileFormat = (file.originalname).split(".")
+            cb(null,fileFormat[0] + "." + fileFormat[fileFormat.length - 1])
+        }
+    })
+    let upload = multer({storage:storage})
+    router.post('/insert',upload.single('file'),async (ctx,next) => {  
+        ctx.response.body ='<h1>SUCCED</h1>'
+    })
+}
+
 module.exports = function (dir) {
     let c_dir = dir || 'controllers'
     let  router = require('koa-router')()
     addControllers(router, c_dir)
+    addUploader(router)
     return router.routes()
 };
