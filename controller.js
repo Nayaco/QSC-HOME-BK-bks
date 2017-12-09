@@ -1,5 +1,7 @@
-const fs = require('fs')
+const os = require('os')
 const path = require('path')
+const fs = require('fs')
+let counter = {}
 
 addHandles = (router, handles) => {
     for (let url in handles) {
@@ -36,23 +38,43 @@ function addControllers(router, c_dir) {
 }
 
 function addUploader(router){
-    console.log(`register URL handles: POST /insert`)
-    const multer = require('koa-multer')
-    const MyCustomStorage = require('./UploadMode')
-    let storage = MyCustomStorage({
-        destination:function (req,file,cb) {
-            let final_path = __dirname + '\\static\\' 
-            console.log(final_path)
-            cb(null,final_path)  
-        },
-        filename:function (req,file,cb){
-            let fileFormat = (file.originalname).split(".")
-            cb(null,fileFormat[0] + "." + fileFormat[fileFormat.length - 1])
+    router.post('/insert',async (ctx,next) => {
+        v_info = ctx.request.header
+        if(v_info.tag == 0){
+            delete(counter[v_info.id])
+            ctx.body = 'Trans Finished'
+            ctx.response.set({
+                'status' : 1
+            })
+        }else{
+            try{
+                const tmpdir = __dirname + '\\static\\'
+                const filePaths = []
+                const files = ctx.request.body.files || {}
+                for (let key in files) {
+                    const file = files[key]
+                    const filePath = tmpdir + file.name
+                    const v_sourse = fs.createReadStream(file.path)
+                    const v_writer = fs.createWriteStream(filePath, {'flags' : 'a'})
+                    v_sourse.pipe(v_writer)
+                    filePaths.push(filePath)
+                }
+                if(!filePaths.length)throw('File Break')
+                ctx.response.set({
+                    'status' : 1
+                })
+                ctx.body = filePaths
+                counter[v_info.id] === undefined ? counter[v_info.id] = 1 : counter[v_info.id] ++
+                }catch(err){
+                    counter = 0
+                    ctx.response.status = 301
+                    ctx.response.set({
+                        'Location' : '/',
+                        'status' : 0
+                    })
+                    ctx.body = err
+                }
         }
-    })
-    let upload = multer({storage:storage})
-    router.post('/insert',upload.single('file'),async (ctx,next) => {  
-        ctx.response.body ='<h1>SUCCED</h1>'
     })
 }
 
