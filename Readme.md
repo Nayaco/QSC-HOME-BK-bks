@@ -1,1 +1,1 @@
-#GangDou Create a Bakend* /list ok* / zero* /insert half* /delete zero####**We need a frontend and the list of database API**####**We need a tag in POST for each part of a sliced fle.**
+**GangDou Create a Bakend****We need a frontend and the list of database API****We need a tag in POST for each part of a sliced fle.****Database API needed**我已经糊了一个大概的接收框架，接下就是来要把剩下糊了
