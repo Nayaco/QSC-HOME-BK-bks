@@ -14,7 +14,7 @@ v_server.use(async(ctx,next) => {
     ctx.response.set('X-Response-Time', `${execTime}ms`)
 })
 
-v_server.use(koaBody({ multipart: true }))
+v_server.use(koaBody({multipart: true, formLimit: 5*1024}))
 v_server.use(parser())
 v_server.use(controller())
 
@@ -27,4 +27,5 @@ v_server.listen(8080)
 ///.................GD201712090128................................
 ///Gangdou abandon the koa-multer for that it's ridiculous, i rewrite  
 ///the '/insert' by koa-body 
+///We need database API
 ///.................GD201712092137................................

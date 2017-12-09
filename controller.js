@@ -38,32 +38,30 @@ function addControllers(router, c_dir) {
 }
 
 function addUploader(router){
-    router.post('/insert',async (ctx,next) => {
+    router.post('/fileupload',async (ctx,next) => {
         v_info = ctx.request.header
         if(v_info.tag == 0){
             delete(counter[v_info.id])
-            ctx.body = 'Trans Finished'
             ctx.response.set({
                 'status' : 1
             })
         }else{
             try{
                 const tmpdir = __dirname + '\\static\\'
-                const filePaths = []
                 const files = ctx.request.body.files || {}
+                let f_l = 0
                 for (let key in files) {
                     const file = files[key]
                     const filePath = tmpdir + file.name
                     const v_sourse = fs.createReadStream(file.path)
                     const v_writer = fs.createWriteStream(filePath, {'flags' : 'a'})
                     v_sourse.pipe(v_writer)
-                    filePaths.push(filePath)
+                    f_l ++
                 }
-                if(!filePaths.length)throw('File Break')
+                if(!f_l)throw('File Break')
                 ctx.response.set({
                     'status' : 1
                 })
-                ctx.body = filePaths
                 counter[v_info.id] === undefined ? counter[v_info.id] = 1 : counter[v_info.id] ++
                 }catch(err){
                     counter = 0
