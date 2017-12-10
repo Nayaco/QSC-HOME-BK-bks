@@ -1,7 +1,14 @@
 const os = require('os')
 const path = require('path')
 const fs = require('fs')
-let counter = {}
+
+//Universal handles adder
+//1.GET /
+//2.GET /list
+//3.POST /insert
+//4.POST /edit
+//5.POST /delete 
+
 addHandles = (router, handles) => {
     for (let url in handles) {
         if (url.startsWith('GET ')) {
@@ -36,6 +43,8 @@ function addControllers(router, c_dir) {
     });
 }
 
+//I need a isolated uploader listener,though I don't know why.
+let counter = {}
 function addUploader(router){
     router.post('/upload',async (ctx,next) => {
         const v_info = ctx.request.body.fields

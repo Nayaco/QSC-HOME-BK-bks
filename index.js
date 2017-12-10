@@ -1,3 +1,7 @@
+/*..........................................
+//Video admin backend (almost finished)
+//Video user backend (unfinished) 
+...........................................*/
 const Koa = require('koa')
 const parser = require('koa-bodyparser')
 const router = require('koa-router')()
@@ -28,5 +32,7 @@ v_server.listen(8080)
 ///the '/insert' by koa-body 
 ///We need database API
 ///.................GD201712092137................................
-///Gnagdou get a good 
-///
+///Gnagdou made a better work uploader by 'koa-body' + 'fs' 
+///.................GD201712101759................................
+///Gangdou fix some bugs
+///.................GD201712102139................................
