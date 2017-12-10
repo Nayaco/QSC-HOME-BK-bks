@@ -2,7 +2,6 @@ const os = require('os')
 const path = require('path')
 const fs = require('fs')
 let counter = {}
-
 addHandles = (router, handles) => {
     for (let url in handles) {
         if (url.startsWith('GET ')) {
@@ -38,40 +37,46 @@ function addControllers(router, c_dir) {
 }
 
 function addUploader(router){
-    router.post('/fileupload',async (ctx,next) => {
-        v_info = ctx.request.header
-        if(v_info.tag == 0){
-            delete(counter[v_info.id])
+    router.post('/upload',async (ctx,next) => {
+        const v_info = ctx.request.body.fields
+        let sizer = 0
+        try{
+            if(v_info.tag > counter[v_info.id] + 1)throw('File Losted')
+            const tmpdir = __dirname + '\\static\\'
+            const filePaths = []
+            const files = ctx.request.body.files || {}
+            for (let key in files) {
+                const file = files[key]
+                sizer += file.size
+                const filePath = tmpdir + file.name
+                const v_sourse = fs.createReadStream(file.path)
+                const v_writer = fs.createWriteStream(filePath,{'flags':'a'})
+                v_sourse.pipe(v_writer)
+                filePaths.push(filePath)
+            }
+            if(!filePaths.length)throw('File Break')
+            ctx.response.status = 200
             ctx.response.set({
+                'Access-Control-Allow-Headers' : 'Origin, X-Requested-With, Content-Type, Accept',
+                'Access-Control-Allow-Origin' : '*',
+                'Cache-Control' : 'no-store, no-cache, must-revalidate',
                 'status' : 1
             })
-        }else{
-            try{
-                const tmpdir = __dirname + '\\static\\'
-                const files = ctx.request.body.files || {}
-                let f_l = 0
-                for (let key in files) {
-                    const file = files[key]
-                    const filePath = tmpdir + file.name
-                    const v_sourse = fs.createReadStream(file.path)
-                    const v_writer = fs.createWriteStream(filePath, {'flags' : 'a'})
-                    v_sourse.pipe(v_writer)
-                    f_l ++
-                }
-                if(!f_l)throw('File Break')
-                ctx.response.set({
-                    'status' : 1
-                })
-                counter[v_info.id] === undefined ? counter[v_info.id] = 1 : counter[v_info.id] ++
-                }catch(err){
-                    counter = 0
-                    ctx.response.status = 301
-                    ctx.response.set({
-                        'Location' : '/',
-                        'status' : 0
-                    })
-                    ctx.body = err
-                }
+            if(counter[v_info.id] === undefined)counter[v_info.id] = 1
+                else counter[v_info.id] ++
+            if(sizer < 5*1024*1024){
+                delete(counter[v_info.id])
+                ctx.body = 'Trans Finished'
+            }
+        }catch(err){
+            delete(counter[v_info.id])
+            ctx.response.status = 400
+            ctx.response.set({
+                'status' : 0
+            })
+            ctx.body = {
+                'Errmessage' : err
+            }
         }
     })
 }

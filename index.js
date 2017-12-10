@@ -14,7 +14,7 @@ v_server.use(async(ctx,next) => {
     ctx.response.set('X-Response-Time', `${execTime}ms`)
 })
 
-v_server.use(koaBody({multipart: true, formLimit: 5*1024}))
+v_server.use(koaBody({multipart: true, formLimit: 5*1024+2}))
 v_server.use(parser())
 v_server.use(controller())
 
@@ -28,3 +28,5 @@ v_server.listen(8080)
 ///the '/insert' by koa-body 
 ///We need database API
 ///.................GD201712092137................................
+///Gnagdou get a good 
+///
