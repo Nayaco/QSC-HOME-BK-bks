@@ -5,9 +5,21 @@
 const Koa = require('koa')
 const parser = require('koa-bodyparser')
 const router = require('koa-router')()
+const session = require('koa-session-minimal')
+const Mysqlstorage = require('koa-mysql-session')
+const dbconfig = require('./lib/dbconfig')
 const controller = require('./controller')
 const koaBody = require('koa-body')
+const serverconfig = require('./serverconfig')
 const v_server = new Koa()
+
+//Mysqlsession config
+const Mysqlconfig = {
+    user: dbconfig.user,
+    password: dbconfig.password,
+    database: dbconfig.database,
+    host: dbconfig.host
+}
 
 v_server.use(async(ctx,next) => {  
     console.log(`Process ${ctx.request.method} ${ctx.request.url}...`)  
@@ -18,11 +30,16 @@ v_server.use(async(ctx,next) => {
     ctx.response.set('X-Response-Time', `${execTime}ms`)
 })
 
+/*v_server.use(session({
+        key : 'USER_SID',
+        store: new Mysqlstorage(Mysqlconfig)
+}))*/
 v_server.use(koaBody({multipart: true, formLimit: 5*1024+2}))
 v_server.use(parser())
 v_server.use(controller())
 
-v_server.listen(8080)
+v_server.listen(serverconfig.port)
+console.log(`Port ${serverconfig.port} on listening`)
 ///................................................................
 ///Gangdou create a basic server with koa
 ///'GET /list'works and I finish the appendupload of 'POST /insert'.

@@ -1,28 +1,32 @@
 const path = require('path')
 const fs = require('fs')
+const db = require('../lib/dbhandler')
 
-//..........................................//
-const db_filelist = () =>{                  //
-    return new Promise((resolve, reject)=>{ //
-        resolve('...')                      //
-    })                                      //
-}                                           //
-const db_filesearch = (id) =>{              //
-    return new Promise((resolve, reject)=>{ //
-        const v_info = {                    //
-            'directory' : ''                //
-        }                                   //
-        resolve(v_info)                     //
-    })                                      //
-}                                           //
-const db_filewriter = (info) =>{            //
-    return new Promise((resolve,reject)=>{  //
-        resolve(1)                          //
-    })                                      //We need some database handles.
-}                                           //I need to know it's myQSL or others.(I'm just kidding)
-//..........................................//emmmmm...
+const table = ''
+
+const local_filelist = (v_path) =>{                          
+    return new Promise((resolve, reject)=>{                            
+        fs.readdir(v_path,(err,files)=>{            
+            if(err){                                
+                return reject(err)                  
+            }                                       
+            else{                                   
+                resolve(files)                    
+            }                                       
+        })                                          
+    })                                              
+}
+
+const local_delete = (v_path) =>{
+    return new Promise((resolve,reject)=>{
+        fs.unlink(v_path, (err)=>{
+            if(err)reject(err)
+            else resolve() 
+        })
+    })
+}
 v_list = async(ctx, next)=>{
-    const v_files = await db_filelist()
+    const v_files = await db.db_filelist()
     ctx.res.type = 'text/plain'
     ctx.body = v_files
 }
@@ -48,17 +52,19 @@ v_insert = async(ctx, next)=>{
 
 v_delete = async(ctx, next)=>{
     const v_grabber = ctx.request.body.fields
-    const v_info = await db_filesearch(v_grabber.id)
+    //const v_info = await db.filesearch(table, v_grabber.name)
+    v_info = {
+        directory : 'documents\\T.png'
+    }
     try{
-        let un_flag
-        fs.unlink(v_info.directory, (err)=>{
-            un_flag = err
-        })
-        if(un_flag)throw(un_flag)
-        ctx.response.status = 200
-        ctx.response.set({
-            'status' : 1
-        })
+        const un_flag = await local_delete(v_info.directory)
+        if(un_flag)throw(err)
+        else{
+            ctx.response.status = 200
+            ctx.response.set({
+                'status' : 1
+            })
+        }   
     }catch(err){
         ctx.response.status = 404
         ctx.response.set({
@@ -79,7 +85,7 @@ v_edit = async(ctx, next)=>{
     const w_status = await db_filewriter(v_info)
     ctx.response.status = 200
     ctx.response.set({
-        'status' : w_status
+        'status' : w_statusk
     })
 }
 

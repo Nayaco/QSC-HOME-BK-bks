@@ -1,14 +1,14 @@
 const os = require('os')
 const path = require('path')
 const fs = require('fs')
-
+//--------------------------------------------------------
 //Universal handles adder
 //1.GET /
 //2.GET /list
 //3.POST /insert
 //4.POST /edit
 //5.POST /delete 
-
+//---------------------------------------------------------
 addHandles = (router, handles) => {
     for (let url in handles) {
         if (url.startsWith('GET ')) {
@@ -51,7 +51,7 @@ function addUploader(router){
         let sizer = 0
         try{
             if(v_info.tag > counter[v_info.id] + 1)throw('File Losted')
-            const tmpdir = __dirname + '\\static\\'
+            const tmpdir = __dirname + '\\documents\\'
             const filePaths = []
             const files = ctx.request.body.files || {}
             for (let key in files) {
@@ -89,9 +89,10 @@ function addUploader(router){
         }
     })
 }
-
+//All right we now have a exported ...
 module.exports = function (dir) {
-    let c_dir = dir || 'controllers'
+    let c_dir = dir ||
+     'controllers'
     let  router = require('koa-router')()
     addControllers(router, c_dir)
     addUploader(router)
