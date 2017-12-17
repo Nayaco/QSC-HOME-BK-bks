@@ -11,6 +11,7 @@ const dbconfig = require('./lib/dbconfig')
 const controller = require('./controller')
 const koaBody = require('koa-body')
 const serverconfig = require('./serverconfig')
+const list = require('./lib/requestlist')
 const v_server = new Koa()
 
 //Mysqlsession config

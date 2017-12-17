@@ -28,7 +28,7 @@ const local_delete = (v_path) =>{
 v_list = async(ctx, next)=>{
     const v_files = await db.db_filelist()
     ctx.res.type = 'text/plain'
-    ctx.body = v_files
+    ctx.body = 'aaaaaa'
 }
 
 v_insert = async(ctx, next)=>{

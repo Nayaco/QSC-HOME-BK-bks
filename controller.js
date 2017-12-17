@@ -1,6 +1,9 @@
 const os = require('os')
 const path = require('path')
 const fs = require('fs')
+const serverconfig = require('./serverconfig')
+const r_list = require('./lib/requestlist')
+const mime = require('./lib/MIME').type
 //--------------------------------------------------------
 //Universal handles adder
 //1.GET /
@@ -33,49 +36,72 @@ addHandles = (router, handles) => {
     }
 }
 
-function addControllers(router, c_dir) {
+addControllers = (router, c_dir) => {
     fs.readdirSync(__dirname + '/' + c_dir).filter((f) => {
         return f.endsWith('.js')
     }).forEach((f) => {
         console.log(`process controller: ${f}...`)
         let handles = require(__dirname + '/' + c_dir + '/' + f)
         addHandles(router, handles)
-    });
+    })
+}
+
+addstaticr = (router) =>{
+    console.log(`register URL handles: GET /... ...`)
+    router.get('/:id',async(ctx,next)=>{
+        try{
+            const s_path = serverconfig.static + '\\' + ctx.request.url.substring(1)
+            const file = fs.readFileSync(s_path)
+            const extnames = path.extname(s_path)
+            ctx.body = file
+            ctx.type = mime[extnames]
+            ctx.status = 200
+        }catch(err){
+            ctx.body = 'Object not found'
+            ctx.status = 404
+        }
+    })
 }
 
 //I need a isolated uploader listener,though I don't know why.
 let counter = {}
-function addUploader(router){
+
+addUploader = (router) => {
     router.post('/upload',async (ctx,next) => {
         const v_info = ctx.request.body.fields
         let sizer = 0
         try{
             if(v_info.tag > counter[v_info.id] + 1)throw('File Losted')
-            const tmpdir = __dirname + '\\documents\\'
+            const tmpdir = serverconfig.document_path
             const filePaths = []
             const files = ctx.request.body.files || {}
             for (let key in files) {
                 const file = files[key]
                 sizer += file.size
-                const filePath = tmpdir + file.name
+                const filePath = path.join(tmpdir,file.name)
                 const v_sourse = fs.createReadStream(file.path)
                 const v_writer = fs.createWriteStream(filePath,{'flags':'a'})
+                v_writer.on('error',(err)=>{
+                    throw(err)
+                })
                 v_sourse.pipe(v_writer)
                 filePaths.push(filePath)
             }
-            if(!filePaths.length)throw('File Break')
-            ctx.response.status = 200
-            ctx.response.set({
-                'Access-Control-Allow-Headers' : 'Origin, X-Requested-With, Content-Type, Accept',
-                'Access-Control-Allow-Origin' : '*',
-                'Cache-Control' : 'no-store, no-cache, must-revalidate',
-                'status' : 1
-            })
-            if(counter[v_info.id] === undefined)counter[v_info.id] = 1
-                else counter[v_info.id] ++
-            if(sizer < 5*1024*1024){
-                delete(counter[v_info.id])
-                ctx.body = 'Trans Finished'
+            if(!filePaths.length)throw('No File')
+            else{
+                ctx.response.status = 200
+                ctx.response.set({
+                    'Access-Control-Allow-Headers' : 'Origin, X-Requested-With, Content-Type, Accept',
+                    'Access-Control-Allow-Origin' : '*',
+                    'Cache-Control' : 'no-store, no-cache, must-revalidate',
+                    'status' : 1
+                })
+                if(counter[v_info.id] === undefined)counter[v_info.id] = 1
+                    else counter[v_info.id] ++
+                if(sizer < 5*1024*1024){
+                    delete(counter[v_info.id])
+                    ctx.body = 'Trans Finished'
+                }
             }
         }catch(err){
             delete(counter[v_info.id])
@@ -94,6 +120,7 @@ module.exports = function (dir) {
     let c_dir = dir ||
      'controllers'
     let  router = require('koa-router')()
+    addstaticr(router)
     addControllers(router, c_dir)
     addUploader(router)
     return router.routes()

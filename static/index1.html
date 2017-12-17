@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Upload</title>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+<input type="file" name="file" id="file">
+<button id="upload" onclick="upload()">upload</button>
+<script>{
+    const MB = 5;
+    const dataPerPiece = MB *1024*1024;
+    let tags = 0
+    function upload()
+    {
+        const blob = document.getElementById("file").files[0];
+        const filesize = blob.size;
+        const filename = blob.name;
+        const totalPieces = Math.ceil(filesize/dataPerPiece);
+        ajax_send(0, blob, filesize, filename);
+    }
+    function ajax_send(start, blob, filesize, filename) {
+        if(start >= filesize)
+            return;
+        const end = Math.min(filesize, start+dataPerPiece);
+        const chunk = blob.slice(start, end);
+        const formData = new FormData();
+        formData.append("file", chunk, filename);
+        $.ajax({
+            url: 'http://localhost:80/upload/',
+            type: 'POST',
+            cache: false,
+            data: formData,
+            processData: false,
+            contentType: false
+        }).done(function (res) {
+            ajax_send(end, blob, filesize, filename);
+        }).fail(function (res) {
+            console.log(res);
+        });
+    }}
+</script>
+</body>
+</html>

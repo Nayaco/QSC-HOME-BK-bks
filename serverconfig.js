@@ -1,3 +1,5 @@
 module.exports = {
-    'port' : 8080
+    'port' : 80,
+    'document_path' : __dirname + '\\documents',
+    'static' : __dirname + '\\static'
 }

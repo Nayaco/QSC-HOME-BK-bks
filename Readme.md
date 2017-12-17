@@ -1,25 +1,85 @@
 **GangDou Create a Bakend**
 
 
-**We need a frontend and the list of database API**
+**改了几个BUG，我好划水(改了点东西糊了个api文档)**
 
 
-**We need a tag in POST for each part of a sliced fle.**
+**现在的能接收文件，然而断点续传还没做(emmmm，有个想法，但还没写)**
 
 
-**Database API needed**
+**last update:20171217**
 
 
-**我糊了一个大概的框架，剩下的交给仙女了hhh**
+**-----------------------------------------------------------------------**
 
 
-**改了几个BUG**
+**GET /(这个要改)**
+            reshead{
+                status : ...
+            }
+            resbody{
+                ...(binary/text/.....)
+            }
 
 
-**现在的能接收文件，然而断点续传还没做**
+**POST /uoload**
+            reqbody{
+                id:...(string)
+                data:...(binary)
+                tag:...(intager)
+            }
+            resbody{
+                status:1/0
+            }
 
 
-**last update:20171214**
+**POST /insert**
+            reqbody{
+                'id' : ...(string)
+                'title' : ...(string)
+                'description' : ...(string)
+                'author' : ...(string)
+                'date' : yy-mm-dd-hh-MM-ss(date)
+                'directory' : ...(string)[Don't neccessary]
+                'file' : ...(string)
+                'view' : 0
+            }
+            resbody{
+                status:0/1
+            }
+
+
+**POST /edit**
+            reqbody{
+                'id' : ...(string)
+                'title' : ...(string)
+                'description' : ...(string)
+                'author' : ...(string)
+                'date' : yy-mm-dd-hh-MM-ss(date)
+            }
+            resbody{
+                status:0/1
+            }
+
+
+**POST /delete**
+            reqbody{
+                'id'/'title' : ...(string)
+            }
+            resbody{
+                status:0/1
+            }
+
+
+**GET /list**
+            resbody{
+                status:0/1
+                filelist:...(json)
+            }
+
+
+**-------------------------------------------------------------------------------**
+
 
 
 
