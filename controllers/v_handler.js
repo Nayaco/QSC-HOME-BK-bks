@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require('fs')
-const db = require('../lib/dbhandler')
+const db = require('./dbhandler')
 
 const table = ''
 
@@ -56,21 +56,14 @@ v_delete = async(ctx, next)=>{
     v_info = {
         directory : 'documents\\T.png'
     }
-    try{
-        const un_flag = await local_delete(v_info.directory)
-        if(un_flag)throw(err)
-        else{
-            ctx.response.status = 200
-            ctx.response.set({
-                'status' : 1
-            })
-        }   
-    }catch(err){
-        ctx.response.status = 404
+    const un_flag = await local_delete(v_info.directory)
+    if(un_flag)throw(err)
+    else{
+        ctx.response.status = 200
         ctx.response.set({
-            'status' : 0
+            'status' : 1
         })
-    }
+    }   
 }
 
 v_edit = async(ctx, next)=>{
@@ -90,8 +83,8 @@ v_edit = async(ctx, next)=>{
 }
 
 module.exports = {
-    'GET /list' : v_list,
-    'POST /insert' : v_insert,
-    'POST /delete' : v_delete,
-    'POST /edit' : v_edit
+    'GET /console/list' : v_list,
+    'POST /console/insert' : v_insert,
+    'POST /console/delete' : v_delete,
+    'POST /console/edit' : v_edit
 }

@@ -13,14 +13,16 @@
 **-----------------------------------------------------------------------**
 
 
-**GET /(这个要改)**
+**GET /**
             reshead{
-                status : ...
-            }
-            resbody{
-                ...(binary/text/.....)
+                status : 301
+                -->/console/index.html
             }
 
+**GET /console/:id**
+            resbody{
+                ...(binary/....)
+            }
 
 **POST /uoload**
             reqbody{

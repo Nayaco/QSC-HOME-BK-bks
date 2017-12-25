@@ -1,5 +1,5 @@
 const mysql = require('mysql2')
-const dbconfig = require('./dbconfig')
+const dbconfig = require('../lib/dbconfig')
 const dboption = {
     host : dbconfig.host,
     port : dbconfig.port,

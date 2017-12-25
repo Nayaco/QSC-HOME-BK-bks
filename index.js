@@ -3,14 +3,14 @@
 //Video user backend (unfinished) 
 ...........................................*/
 const Koa = require('koa')
+const koaBody = require('koa-body')
 const parser = require('koa-bodyparser')
 const router = require('koa-router')()
 const session = require('koa-session-minimal')
 const Mysqlstorage = require('koa-mysql-session')
 const dbconfig = require('./lib/dbconfig')
-const controller = require('./controller')
-const koaBody = require('koa-body')
-const serverconfig = require('./serverconfig')
+const controller = require('./controllers/controller')
+const serverconfig = require('./lib/serverconfig')
 const list = require('./lib/requestlist')
 const v_server = new Koa()
 
@@ -30,12 +30,21 @@ v_server.use(async(ctx,next) => {
     execTime = new Date().getTime() - start   
     ctx.response.set('X-Response-Time', `${execTime}ms`)
 })
-
+v_server.use(async(ctx,next) => {
+    try {
+        await next();
+    }catch(err){
+        ctx.response.status = err.statusCode || err.status || 500
+        ctx.response.body = {
+          message: err.message
+        };
+    }
+})
 /*v_server.use(session({
         key : 'USER_SID',
         store: new Mysqlstorage(Mysqlconfig)
 }))*/
-v_server.use(koaBody({multipart: true, formLimit: 5*1024+2}))
+v_server.use(koaBody({multipart: true, formLimit: 5*1024}))
 v_server.use(parser())
 v_server.use(controller())
 
