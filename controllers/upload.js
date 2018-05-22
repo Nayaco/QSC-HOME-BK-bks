@@ -1,7 +1,7 @@
 const fspr = require('fs-promise')
 const path = require('path')
 const fs = require('fs')
-const serverconfig = require('../lib/serverconfig')
+const serverconfig = require('../configs/serverconfig')
 const crypto = require('crypto')
 
 //This is a video uploader
@@ -17,7 +17,7 @@ const f_write = (path1, path2, tag) =>{
         })
         if(tag == 0)v_sourse.on('data',(data)=>{hash.update(data)})
         v_sourse.on('end',()=>{
-            resolve(hash)
+            resolve(hash.digest('hex'))
         })
     })
 }
@@ -26,10 +26,6 @@ v_upload = async(ctx,next) => {
     const v_info = ctx.request.body.fields
     const tmpdir = serverconfig.document_path
     let f_info
-    //const file_list_t = fs.readFileSync(path.join(tmpdir,`filelist.json`),{flag : 'w+'})
-    //const file_list = (file_list_t!='')?JSON.parse(file_list_t):{}
-    //const name = file.ctx.response.body.files['file'].name
-    //const filename = (file_list[name])?file_list[name]:(new Date().toTimeString())
     const filename = ctx.request.body.files['file'].name
     if(v_info.tag == 0){
         if(fs.existsSync(path.join(tmpdir,`${filename}.json`))){
@@ -54,11 +50,9 @@ v_upload = async(ctx,next) => {
     }
 
     const file = ctx.request.body.files['file'] || {}
-    const sizer = file.size
     const filePath = v_info.tag == 0?path.join(tmpdir,filename):path.join(tmpdir,)
     
     const hash = await f_write(file.path,filePath,v_info.tag)
-    //console.log(hash.digest('hex'))
 
     if(!filePath){
         throw({message : 'No file'})
@@ -71,15 +65,15 @@ v_upload = async(ctx,next) => {
             'Cache-Control' : 'no-store, no-cache, must-revalidate'
         })
         ctx.body = {
-                'status' : 1
+            'status' : 1
         }
         const j_info = {
             tag : f_info.tag + 1
         }
-        if(sizer < 5*1024*1024){
-            j_info['isfinish'] = true
+        if(v_info.complete == true){
+            j_info.isfinish = true
         }else{
-            j_info['isfinish'] = false
+            j_info.isfinish = false
         }
         fs.writeFileSync(path.join(tmpdir,`${filename}.json`),JSON.stringify(j_info),'utf-8')
     }

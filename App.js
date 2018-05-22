@@ -8,10 +8,10 @@ const parser = require('koa-bodyparser')
 const router = require('koa-router')()
 const session = require('koa-session-minimal')
 const Mysqlstorage = require('koa-mysql-session')
-const dbconfig = require('./lib/dbconfig')
-const controller = require('./controllers/controller')
-const serverconfig = require('./lib/serverconfig')
-const list = require('./lib/requestlist')
+const dbconfig = require('./configs/dbconfig')
+const controller = require('./controllers/index')
+const serverconfig = require('./configs/serverconfig')
+const list = require('./configs/requestlist')
 const v_server = new Koa()
 
 //Mysqlsession config
@@ -41,9 +41,13 @@ v_server.use(async(ctx,next) => {
     }
 })
 /*v_server.use(session({
-        key : 'USER_SID',
-        store: new Mysqlstorage(Mysqlconfig)
+    key : 'USER_SID',
+    store: new Mysqlstorage(Mysqlconfig)
 }))*/
+v_server.use(async(ctx, next)=>{
+    ctx.set('Access-Control-Allow-Origin', '*') 
+    await next()
+})
 v_server.use(koaBody({multipart: true, formLimit: 5*1024}))
 v_server.use(parser())
 v_server.use(controller())

@@ -9,76 +9,103 @@
 
 **last update:20171217**
 
-
-**-----------------------------------------------------------------------**
-
+---
 
 **GET /**
-            reshead{
-                status : 301
-                -->/console/index.html
-            }
+            
+```
+reshead{
+    status : 301
+    -->/console/index.html
+}
+```
+
+---
 
 **GET /console/:id**
-            resbody{
-                ...(binary/....)
-            }
+```
+@ res{
+    ...(binary/....)
+}
+```
+
+## upload-handles 
+the two api above should be use to add an file to the server
+
+---
 
 **POST /uoload**
-            reqbody{
-                id:...(string)
-                data:...(binary)
-                tag:...(intager)
-            }
-            resbody{
-                status:1/0
-            }
 
+upload a piece of file
+```
+@ req{
+    id:...(string)
+    data:...(binary)
+    tag:...(intager)
+    complete: true/false
+}
+@ res{
+    status:1/0
+}
+```
+
+---
 
 **POST /insert**
-            reqbody{
-                'id' : ...(string)
-                'title' : ...(string)
-                'description' : ...(string)
-                'author' : ...(string)
-                'date' : yy-mm-dd-hh-MM-ss(date)
-                'directory' : ...(string)[Don't neccessary]
-                'file' : ...(string)
-                'view' : 0
-            }
-            resbody{
-                status:0/1
-            }
 
+add an file
+```
+@ req{
+    id : ...(string)
+    title : ...(string)
+    description : ...(string)
+    author : ...(string)
+    date : yy-mm-dd-hh-MM-ss(date)
+    directory : ...(string)[optional]
+    file : ...(string)
+    view : 0
+}
+@ res{
+    status: 0/1
+}
+```
+
+---
 
 **POST /edit**
-            reqbody{
-                'id' : ...(string)
-                'title' : ...(string)
-                'description' : ...(string)
-                'author' : ...(string)
-                'date' : yy-mm-dd-hh-MM-ss(date)
-            }
-            resbody{
-                status:0/1
-            }
 
+edit an file
+```
+@ req{
+    id : ...(string)
+    title : ...(string)
+    description : ...(string)
+    author : ...(string)
+    date : yy-mm-dd-hh-MM-ss(date)
+}
+@ res{
+    status:0/1
+}
+```
 
 **POST /delete**
-            reqbody{
-                'id'/'title' : ...(string)
-            }
-            resbody{
-                status:0/1
-            }
-
+delete an file
+```   
+@ req{
+    id/title : ...(string)
+}
+@ res{
+    status:0/1
+}
+```
 
 **GET /list**
-            resbody{
-                status:0/1
-                filelist:...(json)
-            }
-
+```
+@ res{
+    status:0/1
+    filelist:...(json)
+}
+```
 
 **-------------------------------------------------------------------------------**
 

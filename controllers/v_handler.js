@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require('fs')
-const db = require('./dbhandler')
+const db = require('../lib/dbhandler')
 
 const table = ''
 
@@ -17,7 +17,7 @@ const local_filelist = (v_path) =>{
     })                                              
 }
 
-const local_delete = (v_path) =>{
+const delete_local = (v_path) =>{
     return new Promise((resolve,reject)=>{
         fs.unlink(v_path, (err)=>{
             if(err)reject(err)
@@ -25,6 +25,7 @@ const local_delete = (v_path) =>{
         })
     })
 }
+
 v_list = async(ctx, next)=>{
     const v_files = await db.db_filelist()
     ctx.res.type = 'text/plain'
@@ -33,20 +34,20 @@ v_list = async(ctx, next)=>{
 
 v_insert = async(ctx, next)=>{
     console.log(`Insert on running...`)
-    const v_grabber = ctx.request.body.fields
+    const v_grabber = JSON.parse(ctx.request.body)
     const v_info = {
-        'id' : v_grabber.id,
-        'title' : v_grabber.title,
-        'description' : v_grabber.description,
-        'author' : v_grabber.author,
-        'date' : v_grabber.date,
-        'directory' : v_grabber.directory,
-        'file' : v_grabber.file,
-        'view' : 0
+        id: v_grabber.id || 0,
+        title: v_grabber.title || '',
+        description: v_grabber.description || '',
+        author: v_grabber.author || '',
+        date: v_grabber.date || 0,
+        directory: v_grabber.directory || '',
+        file: v_grabber.file || '',
+        view: 0
     }
     ctx.response.status = 200
     ctx.response.body = {
-        'status' : 1
+        status: 1
     }
 }
 
@@ -56,7 +57,7 @@ v_delete = async(ctx, next)=>{
     v_info = {
         directory : 'documents\\T.png'
     }
-    const un_flag = await local_delete(v_info.directory)
+    const un_flag = await delete_local(v_info.directory)
     if(un_flag)throw(err)
     else{
         ctx.response.status = 200
