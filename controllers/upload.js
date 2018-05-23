@@ -23,10 +23,13 @@ const f_write = (path1, path2, tag) =>{
 }
 
 v_upload = async(ctx,next) => {
-    const v_info = ctx.request.body.fields
+    let v_info = ctx.request.body.fields
     const tmpdir = serverconfig.document_path
-    let f_info
+    let f_info = {
+        tag: 0
+    }
     const filename = ctx.request.body.files['file'].name
+    console.log(ctx.request.body.files['file'])
     if(v_info.tag == 0){
         if(fs.existsSync(path.join(tmpdir,`${filename}.json`))){
             f_info = JSON.parse(fs.readFileSync(path.join(tmpdir,`${filename}.json`),{'encoding':null,'flag':'r'}))
@@ -50,7 +53,7 @@ v_upload = async(ctx,next) => {
     }
 
     const file = ctx.request.body.files['file'] || {}
-    const filePath = v_info.tag == 0?path.join(tmpdir,filename):path.join(tmpdir,)
+    const filePath = v_info.tag == 0?path.join(tmpdir, filename):path.join(tmpdir,)
     
     const hash = await f_write(file.path,filePath,v_info.tag)
 
@@ -61,8 +64,7 @@ v_upload = async(ctx,next) => {
         ctx.response.status = 200
         ctx.response.set({
             'Access-Control-Allow-Headers' : 'Origin, X-Requested-With, Content-Type, Accept',
-            'Access-Control-Allow-Origin' : '*',
-            'Cache-Control' : 'no-store, no-cache, must-revalidate'
+            'Cache-Control' : 'no-store, no-cache, must-revalidate',
         })
         ctx.body = {
             'status' : 1

@@ -40,7 +40,7 @@ upload a piece of file
 ```
 @ req{
     id:...(string)
-    data:...(binary)
+    file:...(binary)
     tag:...(intager)
     complete: true/false
 }
