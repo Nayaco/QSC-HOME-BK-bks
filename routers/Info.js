@@ -7,7 +7,7 @@ const Fieldc = require('./util/fieldscheck').FieldsCheck
 const fieldc = new Fieldc(AppConfig.FeildsConfig) 
 
 /*
- * insert an object
+ * insert an object from db
  * @ param :
  *   {
  *     info : object[should be legal as what i said in md]
@@ -48,6 +48,17 @@ const Insert = async(ctx, next) =>{
     return
 }
 
+/*
+ * delete an object from db
+ * @ query :
+ *   {
+ *     id : string[should be a legal ID]
+ *   }
+ * @ return :
+ *   {
+ *     status : string
+ *   }
+ */
 const Delete = (ctx, next)=>{
     const id = ctx.request.query.id
     let Res = {status: ''}
@@ -72,6 +83,17 @@ const Delete = (ctx, next)=>{
     return
 }    
 
+/*
+ * edit an object from db
+ * @ param :
+ *   {
+ *     info : object[should be legal as what i said in md(PS:should have a legal ID)]
+ *   }
+ * @ return :
+ *   {
+ *     status : string       
+ *   }
+ */
 const Edit = (ctx, next)=>{
     const {fields, files} = ctx.request.body
     const keys = Object.keys(fields)
@@ -88,6 +110,7 @@ const Edit = (ctx, next)=>{
         res[item] = fields[item]
         return res
     }, {})
+
     /// check if id is legal
     const CheckInfo = await pool.lgetdatabyID(AppConfig.Table, 'id', 'id', id)
     if(CheckInfo[data].length == 0){
@@ -110,13 +133,16 @@ const Edit = (ctx, next)=>{
     }
     return 
 }
+
 module.exports = {
     API: {
         '/info/insert': Insert,
         '/info/delete': Delete, 
+        '/info/edit': Edit,
     },
     LIST: {
         Insert: 'POST /info/insert',
         Delete: 'GET /info/delete',
+        Edit: 'POST /info/edit',
     },
 }

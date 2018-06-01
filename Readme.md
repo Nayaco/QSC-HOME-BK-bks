@@ -9,9 +9,10 @@
 
 **last update:20171217**
 
+## Home
 ---
 
-**GET /**
+GET /
             
 ```
 reshead{
@@ -20,50 +21,60 @@ reshead{
 }
 ```
 
----
-
-**GET /console/:id**
-```
-@ res{
-    ...(binary/....)
-}
-```
-
-## upload-handles 
+## Files 
 the two api above should be use to add an file to the server
 
 ---
 
-**POST /uoload**
+POST /console/upload
 
 upload a piece of file
 ```
 @ req{
     id:...(string)
-    file:...(binary)
-    tag:...(intager)
+    tag:...(number)
     complete: true/false
+    
+    file:...(binary)
 }
 @ res{
-    status:1/0
+    status: ...(string)
 }
+```
+
+GET /console/list
+list all files in the dir
+```
+@ res{
+    status: ...(string)
+}
+```
+
+GET /console/delete
+delete a file
+```
+@ req{
+    name:...(string){PS: filename}
+}
+@ res{
+    status: ...(string)
+}
+
 ```
 
 ---
 
-**POST /insert**
+## Infomations
+POST /insert
 
 add an file
 ```
 @ req{
     id : ...(string)
-    title : ...(string)
-    description : ...(string)
+    name : ...(string)
+    des : ...(string)
     author : ...(string)
-    date : yy-mm-dd-hh-MM-ss(date)
-    directory : ...(string)[optional]
-    file : ...(string)
-    view : 0
+    time : yy-mm-dd-hh-MM-ss(string)
 }
 @ res{
     status: 0/1
@@ -72,16 +83,16 @@ add an file
 
 ---
 
-**POST /edit**
+POST /edit
 
 edit an file
 ```
 @ req{
     id : ...(string)
-    title : ...(string)
-    description : ...(string)
+    name : ...(string)
+    des : ...(string)
     author : ...(string)
-    date : yy-mm-dd-hh-MM-ss(date)
+    time : yy-mm-dd-hh-MM-ss(string)
 }
 @ res{
     status:0/1

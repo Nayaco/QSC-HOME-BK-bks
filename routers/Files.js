@@ -42,7 +42,9 @@ const Upload = async(ctx, next) =>{
           GnfoPath = path.join(Dir, `Gnfo.json`)
 
     let   Info = (await fs.pathExists(InfoPath))?(await fs.readJson(InfoPath)):({tag: 0, complete: false, hash: ''})
-    let   Gnfo = (await fs.pathExists(GnfoPath))?(await fs.readJson(GnfoPath).then((Val)=>{return Objery.O2A(Val)})):([])
+    let   Fnfo = (await fs.pathExists(GnfoPath))?(await fs.readJson(GnfoPath)):({})
+    let   Lnfo = Object.keys(Fnfo)
+    let   Gnfo = Objery.O2A(Fnfo)
     let   Res =  {status: ''}
     /// fileExist => {'Exist'}
     if(Info.complete == true){
@@ -71,12 +73,13 @@ const Upload = async(ctx, next) =>{
                 ctx.status = 200
                 return
             }
-            Info.hex = Hash
+            Lnfo.push(FileName)
+            Gnfo.push(Hash)
+            const NewFnfo = Objery.A2O2(Lnfo ,Gnfo)
+            fs.writeJson(NewGnfo, GnfoPath)
         }
         Info.tag = fields.tag
         Info.complete = fields.complete
-        const NewGnfo = Objery.A2O(Gnfo)
-        fs.writeJson(NewGnfo, GnfoPath)
         fs.writeJson(Info, InfoPath)
         Res.status = 'Okay'
         ctx.body = JSON.stringify(Res)
@@ -105,8 +108,9 @@ const List = async(ctx, next) =>{
     const Dir = AppConfig.AssetPath
     const GnfoPath = path.join(Dir, `Gnfo.json`)
     
-    let   Gnfo = (await fs.pathExists(GnfoPath))?(await fs.readJson(GnfoPath).then((Val)=>{return Object.keys(Val).map((x)=>Val[x])})):([])
-    const NewGnfo = Objery.A2O(Gnfo)
+    let   Fnfo = (await fs.pathExists(GnfoPath))?(await fs.readJson(GnfoPath)):({})
+    let   Lnfo = Object.keys(Fnfo)
+    const NewGnfo = Objery.A2O(Lnfo)
     ctx.body = JSON.stringify(NewGnfo)
     ctx.status = 200
     return
@@ -127,9 +131,12 @@ const Delete = async(ctx, next) =>{
     const InfoPath = path.join(Dir, `${FileName}.json`),
           FilePath = path.join(Dir, `${FileName}`),
           GnfoPath = path.join(Dir, `Gnfo.json`)
-    let   Gnfo = (await fs.pathExists(GnfoPath))?(await fs.readJson(GnfoPath).then((Val)=>{return Object.keys(Val).map((x)=>Val[x])})):([])
+    let   Fnfo = (await fs.pathExists(GnfoPath))?(await fs.readJson(GnfoPath)):({})
+    let   Lnfo = Object.keys(Fnfo)
+    let   Gnfo = Objery.O2A(Fnfo) 
+
     let Res = {status: ''}
-    if(!Gnfo.includes(FileName)){
+    if(Lnfo.includes(FileName)){
         Res.status = 'Not Exist'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200
@@ -137,9 +144,10 @@ const Delete = async(ctx, next) =>{
     }
     fs.unlink(FilePath)
     fs.unlink(InfoPath)
-    let   index = Gnfo.indexOf(FileName)
+    let   index = Lnfo.indexOf(FileName)
+    Lnfo.splice(index, 1)
     Gnfo.splice(index, 1)
-    const NewGnfo = Objery.A2O(Gnfo)
+    const NewGnfo = Objery.A2O2(Lnfo ,Gnfo)
     fs.writeFile(NewGnfo, GnfoPath)
     Res.status = 'Okay'
     ctx.body = JSON.stringify(Res)
@@ -155,7 +163,7 @@ module.exports = {
     },
     LIST: {
         Upload: 'POST /console/upload',
-        List: 'GET /console/lost',
+        List: 'GET /console/list',
         Delete: 'GET /console/delete',
     },
 }
