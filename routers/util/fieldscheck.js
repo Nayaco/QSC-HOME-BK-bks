@@ -13,6 +13,12 @@ function fieldscheck(struct){
     }
 }
 
+const UDoNL = (data) =>{
+    if(data === undefined || data === null)return true
+        else return false
+}
+
 module.exports = {
-     FieldsCheck: fieldscheck,
+    UdorNl: UDoNL,  
+    FieldsCheck: fieldscheck,
 }

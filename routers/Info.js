@@ -4,6 +4,7 @@ const MySQL = require('../lib/grabber')
 const AppConfig = require('../configs/App.config')
 const pool = new MySQL(AppConfig.MysqlConfig)
 const Fieldc = require('./util/fieldscheck').FieldsCheck
+const UdorNl=  require('./util/fieldscheck').UdorNl
 const fieldc = new Fieldc(AppConfig.FeildsConfig) 
 
 /*
@@ -35,7 +36,7 @@ const Insert = async(ctx, next) =>{
         desc: fields.des || '',
     }
     try{
-        const poolRes = await pool.linsertdata(AppConfig.Table, Info)
+        const poolRes = await pool.linsertdata(AppConfig.Table1, Info)
         Res.status = 'Okay'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200
@@ -62,7 +63,7 @@ const Insert = async(ctx, next) =>{
 const Delete = (ctx, next)=>{
     const id = ctx.request.query.id
     let Res = {status: ''}
-    const Info = await pool.lgetdatabyID(AppConfig.Table, 'id', 'id', id)
+    const Info = await pool.lgetdatabyID(AppConfig.Table1, 'id', 'id', id)
     if(Info[data].length == 0){
         Res = 'No Such Object'
         ctx.body = JSON.stringify(Res)
@@ -70,7 +71,7 @@ const Delete = (ctx, next)=>{
         return
     }
     try{
-        const poolRes = await pool.ldeletedata(AppConfig.Table, 'id', id)
+        const poolRes = await pool.ldeletedata(AppConfig.Table1, 'id', id)
         Res.status = 'Okay'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200
@@ -99,7 +100,7 @@ const Edit = (ctx, next)=>{
     const keys = Object.keys(fields)
     let Res = {status: ''}
     /// chack if there's an ID
-    if(fields['id'] === undefined || fields['id'] === null){
+    if(UdorNl(fields['id'])){
         Res = 'Should Have An ID'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200
@@ -112,7 +113,7 @@ const Edit = (ctx, next)=>{
     }, {})
 
     /// check if id is legal
-    const CheckInfo = await pool.lgetdatabyID(AppConfig.Table, 'id', 'id', id)
+    const CheckInfo = await pool.lgetdatabyID(AppConfig.Table1, 'id', 'id', id)
     if(CheckInfo[data].length == 0){
         Res = 'No Such Object'
         ctx.body = JSON.stringify(Res)
@@ -121,7 +122,7 @@ const Edit = (ctx, next)=>{
     }
 
     try{
-        const poolRes = await pool.lupdate(AppConfig.Table, 'id', Info.id, Info)
+        const poolRes = await pool.lupdate(AppConfig.Table1, 'id', Info.id, Info)
         Res.status = 'Okay'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200
@@ -134,15 +135,61 @@ const Edit = (ctx, next)=>{
     return 
 }
 
+
+const GetID = async(ctx, next) =>{
+    try{
+        const CheckID = await pool.lgetdatabyID(AppConfig.Table2, 'id', 'id', id)
+        const IDList = CheckID['data']
+    }catch(err){
+        throw {
+            status: 200,
+            err: err, 
+        }
+    }
+}
+const SetID = async(ctx, next) =>{
+    const FileName = ctx.query.file
+    const id = ctx.query.id
+    let Res = {status: ''} 
+    if(UdorNl(FileName) || UdorNl(id)){
+        Res.status = 'Should Have ID And Filename'
+        ctx.body = JSON.stringify(Res)
+        ctx.status = 200
+        return
+    }
+    try{
+        const CheckID = await pool.lgetdatabyID(AppConfig.Table2, 'id', 'id', id)
+        const CheckFN = await pool.lgetdatabyID(AppConfig.Table2, 'file', 'file', FileName)
+        if(CheckID['data'].length != 0 && CheckFN['data'].length != 0){
+            Res.status = 'Exist'
+            ctx.body = JSON.stringify(Res)
+            ctx.status = 200
+            return
+        }
+        pool.linsertdata(AppConfig.Table2, {id: id, file: FileName, downloads: 0})
+        Res.status = 'Okay'
+        ctx.body = JSON.stringify(Res)
+        ctx.status = 200
+    }catch(err){
+        throw {
+            status: 200,
+            err: err, 
+        }   
+    }
+    return
+}
+
 module.exports = {
     API: {
         '/info/insert': Insert,
         '/info/delete': Delete, 
         '/info/edit': Edit,
+        '/info/setid': SetID,
     },
     LIST: {
         Insert: 'POST /info/insert',
         Delete: 'GET /info/delete',
         Edit: 'POST /info/edit',
+        SetID: 'GET /info/setid',
     },
 }

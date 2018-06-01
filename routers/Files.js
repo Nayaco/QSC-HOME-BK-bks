@@ -5,6 +5,7 @@ const fs = require('fs-extra')
 const AppConfig = require('../configs/App.config')
 const Crypto = require('crypto')
 const Objery = require('./util/objery')
+const UdorNl=  require('./util/fieldscheck').UdorNl
 
 const WriteF = async(file, filePath) =>{
     return new Promise((resolve,reject) =>{
@@ -148,7 +149,7 @@ const Delete = async(ctx, next) =>{
     Lnfo.splice(index, 1)
     Gnfo.splice(index, 1)
     const NewGnfo = Objery.A2O2(Lnfo ,Gnfo)
-    fs.writeFile(NewGnfo, GnfoPath)
+    fs.writeJson(NewGnfo, GnfoPath)
     Res.status = 'Okay'
     ctx.body = JSON.stringify(Res)
     ctx.status = 200

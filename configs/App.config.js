@@ -35,6 +35,12 @@ module.exports = {
       time: 'VARCHAR(255)',
       des: 'VARCHAR(255)',
     },
-    Table: 'Test',
+    File2ID: {
+      id: 'VARCHAR(255)',
+      file: 'VARCHAR(255)',
+      downloads: 'LONG'
+    },
+    Table1: 'ObjectInfo',
+    Table2: 'ObjectInfo',
 ///-------------
 }
