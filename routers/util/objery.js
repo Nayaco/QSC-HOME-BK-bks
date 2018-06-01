@@ -1,7 +1,7 @@
 'use strict'
 
 const A2O = arr =>{
-    arr.reduce((res, item, index)=>{
+    return arr.reduce((res, item, index)=>{
         res[index] = item
         return res
     }, {})
