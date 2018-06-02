@@ -9,11 +9,11 @@ const fieldc = new Fieldc(AppConfig.FeildsConfig)
 
 /*
  * insert an object from db
- * @ param :
+ * @param
  *   {
  *     info : object[should be legal as what i said in md]
  *   }
- * @ return :
+ * @return
  *   {
  *     status : string       
  *   }
@@ -66,11 +66,11 @@ const Insert = async(ctx, next) =>{
 
 /*
  * delete an object from db
- * @ query :
+ * @param
  *   {
  *     id : string[should be a legal ID]
  *   }
- * @ return :
+ * @return
  *   {
  *     status : string
  *   }
@@ -101,11 +101,11 @@ const Delete = async(ctx, next)=>{
 
 /*
  * edit an object from db
- * @ param :
+ * @param
  *   {
  *     info : object[should be legal as what i said in md(PS:should have a legal ID)]
  *   }
- * @ return :
+ * @return
  *   {
  *     status : string       
  *   }

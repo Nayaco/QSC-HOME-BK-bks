@@ -72,8 +72,8 @@ const Upload = async(ctx, next) =>{
     /// Transmission
     try{
         const flag = await WriteF(files['file'].path, FilePath)
-        const Hash = await GetHash(FilePath)
         if(fields.tag == 0){
+            const Hash = await GetHash(FilePath)
             /// fileHashExist => {'Exist'} 
             if(Gnfo.includes(Hash)){
                 fs.unlink(FilePath)
@@ -86,15 +86,15 @@ const Upload = async(ctx, next) =>{
             Gnfo.push(Hash)
             const NewFnfo = Objery.A2O2(Lnfo ,Gnfo)
             await fs.writeJson(GnfoPath, NewFnfo)
+            Object.assign(Info, {hash: Hash})
         }
-        Object.assign(Info, {tag: fields.tag, complete: fields.complete, hash: Hash})
+        Object.assign(Info, {tag: fields.tag, complete: fields.complete})
         await fs.writeJson(InfoPath, Info)
         Res.status = 'Okay'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200
     }catch(err){
     /// Transmission Failed => {'Error'}
-        console.log(err)
         Res.status = 'Error'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200
@@ -136,6 +136,7 @@ const List = async(ctx, next) =>{
  */
 const Delete = async(ctx, next) =>{
     const FileName = ctx.request.query.name
+    console.log(ctx.request.query)
     const Dir = AppConfig.AssetPath
     const InfoPath = path.join(Dir, `${FileName}.json`),
           FilePath = path.join(Dir, `${FileName}`),
@@ -145,22 +146,28 @@ const Delete = async(ctx, next) =>{
     let   Gnfo = Objery.O2A(Fnfo) 
 
     let Res = {status: ''}
-    if(Lnfo.includes(FileName)){
+    if(!Lnfo.includes(FileName)){
         Res.status = 'Not Exist'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200
         return
     }
-    fs.unlink(FilePath)
-    fs.unlink(InfoPath)
-    let   index = Lnfo.indexOf(FileName)
-    Lnfo.splice(index, 1)
-    Gnfo.splice(index, 1)
-    const NewGnfo = Objery.A2O2(Lnfo ,Gnfo)
-    fs.writeJson(NewGnfo, GnfoPath)
-    Res.status = 'Okay'
-    ctx.body = JSON.stringify(Res)
-    ctx.status = 200
+    try{
+        await fs.unlink(FilePath)
+        await fs.unlink(InfoPath)
+        const index = Lnfo.indexOf(FileName)
+        Lnfo.splice(index, 1)
+        Gnfo.splice(index, 1)
+        const NewGnfo = Objery.A2O2(Lnfo ,Gnfo)
+        fs.writeJson(GnfoPath, NewGnfo)
+        Res.status = 'Okay'
+        ctx.body = JSON.stringify(Res)
+        ctx.status = 200
+    }catch(err){
+        Res.status = 'Error'
+        ctx.body = JSON.stringify(Res)
+        ctx.status = 200
+    }
     return
 }
 
