@@ -12,8 +12,9 @@ module.exports = {
 /// Fields Configs
   FeildsConfig: {
     Fields:{
-      id: true,
+      id: false,
       name: true,
+      file: true,
       author: true,
       time: true,
       des: false,
@@ -31,16 +32,11 @@ module.exports = {
     DataStruct: {
       id: 'VARCHAR(255)',
       name: 'VARCHAR(255)',
+      file: 'VARACHAR(255)',
       author: 'VARCHAR(255)',
       time: 'VARCHAR(255)',
       des: 'VARCHAR(255)',
     },
-    File2ID: {
-      id: 'VARCHAR(255)',
-      file: 'VARCHAR(255)',
-      downloads: 'LONG'
-    },
     Table1: 'ObjectInfo',
-    Table2: 'ObjectInfo',
 ///-------------
 }

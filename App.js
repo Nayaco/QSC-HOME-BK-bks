@@ -4,9 +4,10 @@ const Koa = require('koa')
 const bodyParser = require('koa-bodyparser')
 const KoaRouter = require('koa-router')()
 const session = require('koa-session-minimal')
-const Routers = require('./routers/index')
+const Routers = require('./routers/index').ADDROUTES
 const AppConfig = require('./configs/App.config')
 const koaBody = require('koa-body')
+const koaStatic = require('koa-static')
 
 const App = new Koa()
 
@@ -37,9 +38,9 @@ App.use(koaBody({
     multipart: true,
 }))
 App.use(koaStatic(AppConfig.StaticPath))
-App.use(Routers(router))
+App.use(Routers(KoaRouter))
 
-v_server.listen(AppConfig.ListenPort, ()=>
+App.listen(AppConfig.ListenPort, ()=>
 console.log(`Port ${AppConfig.ListenPort} on listening`))
 ///................................................................
 ///Gangdou create a basic server with koa

@@ -1,13 +1,7 @@
-**GangDou Create a Bakend**
+**GangDou Created a Bakend**
 
-
-**改了几个BUG，我好划水(改了点东西糊了个api文档)**
-
-
-**现在的能接收文件，然而断点续传还没做(emmmm，有个想法，但还没写)**
-
-
-**last update:20171217**
+*changelog 20180602* 
+Some development
 
 ## Home
 ---

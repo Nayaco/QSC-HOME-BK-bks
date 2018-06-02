@@ -27,14 +27,29 @@ const Insert = async(ctx, next) =>{
         ctx.status = 200
         return
     }
+    ///get an ID
+    const FileName = fields['file']
+    const CheckID = await pool.lgetdata(AppConfig.Table1, 'id')
+    const IDList = CheckID['data']
+    let id = 0
+    for(let i = 0; i < IDList.length; i++)id = Math.max(id, IDList[i])
+    /// Check if filename exists
+    const CheckFN = await pool.lgetdatabyID(AppConfig.Table1, 'file', 'file', FileName)
+    if(CheckFN['data'].length != 0){
+        Res.status = 'Exists'
+        ctx.body = JSON.stringify(Res)
+        ctx.status = 200
+        return
+    }
 
     const Info = {
-        id: fields.id,
-        name: fields.name,
-        author: fields.author,
-        time: fields.time,
-        desc: fields.des || '',
-    }
+        id: id,
+        name: fields['name'],
+        file: fields['file'],
+        author: fields['author'],
+        time: fields['time'],
+        des: fields['des'] || '',
+    } 
     try{
         const poolRes = await pool.linsertdata(AppConfig.Table1, Info)
         Res.status = 'Okay'
@@ -60,11 +75,11 @@ const Insert = async(ctx, next) =>{
  *     status : string
  *   }
  */
-const Delete = (ctx, next)=>{
+const Delete = async(ctx, next)=>{
     const id = ctx.request.query.id
     let Res = {status: ''}
     const Info = await pool.lgetdatabyID(AppConfig.Table1, 'id', 'id', id)
-    if(Info[data].length == 0){
+    if(Info['data'].length == 0){
         Res = 'No Such Object'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200
@@ -95,7 +110,7 @@ const Delete = (ctx, next)=>{
  *     status : string       
  *   }
  */
-const Edit = (ctx, next)=>{
+const Edit = async(ctx, next)=>{
     const {fields, files} = ctx.request.body
     const keys = Object.keys(fields)
     let Res = {status: ''}
@@ -114,7 +129,7 @@ const Edit = (ctx, next)=>{
 
     /// check if id is legal
     const CheckInfo = await pool.lgetdatabyID(AppConfig.Table1, 'id', 'id', id)
-    if(CheckInfo[data].length == 0){
+    if(CheckInfo['data'].length == 0){
         Res = 'No Such Object'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200
@@ -135,61 +150,15 @@ const Edit = (ctx, next)=>{
     return 
 }
 
-
-const GetID = async(ctx, next) =>{
-    try{
-        const CheckID = await pool.lgetdatabyID(AppConfig.Table2, 'id', 'id', id)
-        const IDList = CheckID['data']
-    }catch(err){
-        throw {
-            status: 200,
-            err: err, 
-        }
-    }
-}
-const SetID = async(ctx, next) =>{
-    const FileName = ctx.query.file
-    const id = ctx.query.id
-    let Res = {status: ''} 
-    if(UdorNl(FileName) || UdorNl(id)){
-        Res.status = 'Should Have ID And Filename'
-        ctx.body = JSON.stringify(Res)
-        ctx.status = 200
-        return
-    }
-    try{
-        const CheckID = await pool.lgetdatabyID(AppConfig.Table2, 'id', 'id', id)
-        const CheckFN = await pool.lgetdatabyID(AppConfig.Table2, 'file', 'file', FileName)
-        if(CheckID['data'].length != 0 && CheckFN['data'].length != 0){
-            Res.status = 'Exist'
-            ctx.body = JSON.stringify(Res)
-            ctx.status = 200
-            return
-        }
-        pool.linsertdata(AppConfig.Table2, {id: id, file: FileName, downloads: 0})
-        Res.status = 'Okay'
-        ctx.body = JSON.stringify(Res)
-        ctx.status = 200
-    }catch(err){
-        throw {
-            status: 200,
-            err: err, 
-        }   
-    }
-    return
-}
-
 module.exports = {
     API: {
         '/info/insert': Insert,
         '/info/delete': Delete, 
         '/info/edit': Edit,
-        '/info/setid': SetID,
     },
     LIST: {
         Insert: 'POST /info/insert',
         Delete: 'GET /info/delete',
         Edit: 'POST /info/edit',
-        SetID: 'GET /info/setid',
     },
 }

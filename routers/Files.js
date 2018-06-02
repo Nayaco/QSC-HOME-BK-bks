@@ -9,13 +9,20 @@ const UdorNl=  require('./util/fieldscheck').UdorNl
 
 const WriteF = async(file, filePath) =>{
     return new Promise((resolve,reject) =>{
-        const Hash = Crypto.createHash('md5')
-        const Sourse = fs.createReadStream(file)
+        const Source = fs.createReadStream(file)
         const Dst = fs.createWriteStream(filePath, {flags: 'a'})
-        Sourse.pipe(Dst)
-        .on('data', (data)=>{Hash.update(data)})
+        Source.pipe(Dst)
         .on('error', (err)=>{reject(err)})
-        .on('end', ()=>{resolve(Hash.digest('hex'))})
+        .on('finish', ()=>{resolve(true)})
+    })
+}
+const GetHash = async(filePath) =>{
+    return new Promise((resolve,reject) =>{
+        const Source = fs.createReadStream(filePath)
+        const Hash =  Crypto.createHash('sha256')
+        Source.pipe(Hash)
+        .on('error', (err)=>{reject(err)})
+        .on('finish', ()=>{resolve(Hash.digest('hex'))})
     })
 }
 
@@ -41,18 +48,18 @@ const Upload = async(ctx, next) =>{
     const InfoPath = path.join(Dir, `${FileName}.json`),
           FilePath = path.join(Dir, `${FileName}`),
           GnfoPath = path.join(Dir, `Gnfo.json`)
-
-    let   Info = (await fs.pathExists(InfoPath))?(await fs.readJson(InfoPath)):({tag: 0, complete: false, hash: ''})
-    let   Fnfo = (await fs.pathExists(GnfoPath))?(await fs.readJson(GnfoPath)):({})
-    let   Lnfo = Object.keys(Fnfo)
-    let   Gnfo = Objery.O2A(Fnfo)
-    let   Res =  {status: ''}
-    /// fileExist => {'Exist'}
-    if(Info.complete == true){
-        Res.status = 'Exist'
-        ctx.body = JSON.stringify(Res)
-        ctx.status = 200
-        return
+          
+          let   Info = (await fs.pathExists(InfoPath))?(await fs.readJson(InfoPath)):({tag: 0, complete: false, hash: ''})
+          let   Fnfo = (await fs.pathExists(GnfoPath))?(await fs.readJson(GnfoPath)):({})
+          let   Lnfo = Object.keys(Fnfo)
+          let   Gnfo = Objery.O2A(Fnfo)
+          let   Res =  {status: ''}
+          /// fileExist => {'Exist'}
+          if(Info.complete == true){
+              Res.status = 'Exist'
+              ctx.body = JSON.stringify(Res)
+              ctx.status = 200
+              return
     }
     /// Transmission Breaked => {'Breaked', Last-Tag}
     if(Info.tag >= fields.tag && Info.tag > 0){
@@ -61,12 +68,13 @@ const Upload = async(ctx, next) =>{
         ctx.status = 200
         return
     }
-
+    
     /// Transmission
     try{
-        const Hash = await WriteF(files['file'], FilePath)
+        const flag = await WriteF(files['file'].path, FilePath)
+        const Hash = await GetHash(FilePath)
         if(fields.tag == 0){
-    /// fileHashExist => {'Exist'} 
+            /// fileHashExist => {'Exist'} 
             if(Gnfo.includes(Hash)){
                 fs.unlink(FilePath)
                 Res.status = 'Exist'
@@ -77,16 +85,16 @@ const Upload = async(ctx, next) =>{
             Lnfo.push(FileName)
             Gnfo.push(Hash)
             const NewFnfo = Objery.A2O2(Lnfo ,Gnfo)
-            fs.writeJson(NewGnfo, GnfoPath)
+            await fs.writeJson(GnfoPath, NewFnfo)
         }
-        Info.tag = fields.tag
-        Info.complete = fields.complete
-        fs.writeJson(Info, InfoPath)
+        Object.assign(Info, {tag: fields.tag, complete: fields.complete, hash: Hash})
+        await fs.writeJson(InfoPath, Info)
         Res.status = 'Okay'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200
     }catch(err){
     /// Transmission Failed => {'Error'}
+        console.log(err)
         Res.status = 'Error'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200

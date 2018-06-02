@@ -9,7 +9,7 @@ const A2O1 = arr =>{
 
 const A2O2 = (keys, vals) =>{
     return keys.reduce((res, item, index)=>{
-        res[item] = vals[item]
+        res[item] = vals[index]
         return res
     }, {})
 }
