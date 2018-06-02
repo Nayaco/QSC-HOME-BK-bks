@@ -1,11 +1,15 @@
 'use strict'
 
+const path = require('path')
 const MySQL = require('../lib/grabber')
+const AllowType = require('../configs/MediaList')
 const AppConfig = require('../configs/App.config')
 const pool = new MySQL(AppConfig.MysqlConfig, AppConfig.Reg)
+const Objery = require('./util/objery')
 const Fieldc = require('./util/fieldscheck').FieldsCheck
 const UdorNl=  require('./util/fieldscheck').UdorNl
 const fieldc = new Fieldc(AppConfig.FeildsConfig.Fields) 
+const AllowTypes = Objery.O2A(AllowType)
 
 /*
  * insert an object from db
@@ -129,9 +133,10 @@ const Edit = async(ctx, next)=>{
         return res
     }, {})
 
+    const id = Info['id']
     /// check if id is legal
     const CheckInfo = await pool.lgetdatabyID(AppConfig.Table1, 'id', 'id', id)
-    if(CheckInfo['data'].length == 0){
+    if(CheckInfo.length == 0){
         Res = 'No Such Object'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200

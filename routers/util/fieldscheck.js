@@ -14,7 +14,7 @@ function fieldscheck(struct){
 }
 
 const UDoNL = (data) =>{
-    if(data === undefined || data === null)return true
+    if(data === undefined || data === null || data === '')return true
         else return false
 }
 
