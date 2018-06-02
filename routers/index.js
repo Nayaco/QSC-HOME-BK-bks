@@ -8,6 +8,7 @@ const Send = require('./Send')
 const AppGet = (router)=>{
     router.get('/', Home.API['/'])
     router.get('/info/delete', Info.API['/info/delete'])
+    router.get('/info/get', Info.API['/info/get'])
     router.get('/console/list', Files.API['/console/list'])
     router.get('/console/delete', Files.API['/console/delete'])
 }

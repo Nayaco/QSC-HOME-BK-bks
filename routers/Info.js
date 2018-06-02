@@ -55,6 +55,7 @@ const Insert = async(ctx, next) =>{
         ctx.status = 200
         return
     } 
+    //. handle the infomation
     const Info = {
         id: id,
         name: fields['name'],
@@ -111,6 +112,46 @@ const Delete = async(ctx, next)=>{
     }
     return
 }    
+/*
+ * get an object from db
+ * @param
+ *   {
+ *     id : string[should be a legal ID]
+ *   }
+ * @return
+ *   {
+ *     status : string
+ *   }
+ */
+const GetInfo = async(ctx, next)=>{
+    const id = ctx.request.query.id
+    let Res = {status: ''}
+    try{
+        const Info = await pool.lgetdatabyID(AppConfig.Table1, '*', 'id', id)
+        if(Info.length === 0){
+            Res = 'No Such Object'
+            ctx.body = JSON.stringify(Res)
+            ctx.status = 200
+            return
+        }
+        const Temp = Info[0]
+        const NewInfo = {
+            id: id,
+            name: Temp.name,
+            file: Temp.file,
+            author: Temp.author,
+            des: Temp.des,
+        }
+        ctx.body = JSON.stringify(NewInfo)
+        ctx.status = 200
+    }catch(err){
+        throw {
+            status: 200,
+            err: err, 
+        }
+    }
+    return
+}    
 
 /*
  * edit an object from db
@@ -149,7 +190,16 @@ const Edit = async(ctx, next)=>{
         ctx.status = 200
         return
     }
-
+    /// check if filename is legal
+    if(!UdorNl(fields['file'])){
+        if(!AllowTypes.includes(path.extname(fields['file']))){
+            Res.status = 'File Not Allow'
+            ctx.body = JSON.stringify(Res)
+            ctx.status = 200
+            return
+        }
+    }
+    /// handle change
     try{
         const poolRes = await pool.lupdate(AppConfig.Table1, 'id', Info.id, Info)
         Res.status = 'Okay'
@@ -169,10 +219,12 @@ module.exports = {
         '/info/insert': Insert,
         '/info/delete': Delete, 
         '/info/edit': Edit,
+        '/info/get': GetInfo
     },
     LIST: {
         Insert: 'POST /info/insert',
         Delete: 'GET /info/delete',
         Edit: 'POST /info/edit',
+        GetInfo: 'GET /info/edit',
     },
 }
