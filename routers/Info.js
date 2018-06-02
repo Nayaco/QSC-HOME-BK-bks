@@ -2,10 +2,10 @@
 
 const MySQL = require('../lib/grabber')
 const AppConfig = require('../configs/App.config')
-const pool = new MySQL(AppConfig.MysqlConfig)
+const pool = new MySQL(AppConfig.MysqlConfig, AppConfig.Reg)
 const Fieldc = require('./util/fieldscheck').FieldsCheck
 const UdorNl=  require('./util/fieldscheck').UdorNl
-const fieldc = new Fieldc(AppConfig.FeildsConfig) 
+const fieldc = new Fieldc(AppConfig.FeildsConfig.Fields) 
 
 /*
  * insert an object from db
@@ -27,15 +27,17 @@ const Insert = async(ctx, next) =>{
         ctx.status = 200
         return
     }
+    
     ///get an ID
-    const FileName = fields['file']
-    const CheckID = await pool.lgetdata(AppConfig.Table1, 'id')
-    const IDList = CheckID['data']
-    let id = 0
-    for(let i = 0; i < IDList.length; i++)id = Math.max(id, IDList[i])
+    const FileName = fields.file
+    const IDList = await pool.lgetdata(AppConfig.Table1, 'id')
+    let id = -1
+    for(let i = 0; i < IDList.length; i++)id = Math.max(id, IDList[i].id)
+    id++
+
     /// Check if filename exists
     const CheckFN = await pool.lgetdatabyID(AppConfig.Table1, 'file', 'file', FileName)
-    if(CheckFN['data'].length != 0){
+    if(CheckFN.length != 0){
         Res.status = 'Exists'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200
@@ -79,7 +81,7 @@ const Delete = async(ctx, next)=>{
     const id = ctx.request.query.id
     let Res = {status: ''}
     const Info = await pool.lgetdatabyID(AppConfig.Table1, 'id', 'id', id)
-    if(Info['data'].length == 0){
+    if(Info.length === 0){
         Res = 'No Such Object'
         ctx.body = JSON.stringify(Res)
         ctx.status = 200

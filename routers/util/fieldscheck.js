@@ -4,8 +4,8 @@ function fieldscheck(struct){
     this.struct = struct || {}
     this.check = (data) =>{
         const keys = Object.keys(this.struct)
-        for(key in keys){
-            if((data[key] === null || data[key] === undefined) && this.struct[key] === true){
+        for(let i = 0; i < keys.length; i++){
+            if((data[keys[i]] === null || data[keys[i]] === undefined || data[keys[i]] === '') && this.struct[keys[i]] === true){
                 return false
             }
         }

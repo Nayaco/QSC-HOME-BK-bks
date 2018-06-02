@@ -136,7 +136,6 @@ const List = async(ctx, next) =>{
  */
 const Delete = async(ctx, next) =>{
     const FileName = ctx.request.query.name
-    console.log(ctx.request.query)
     const Dir = AppConfig.AssetPath
     const InfoPath = path.join(Dir, `${FileName}.json`),
           FilePath = path.join(Dir, `${FileName}`),

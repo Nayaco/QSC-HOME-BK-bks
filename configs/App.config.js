@@ -25,18 +25,19 @@ module.exports = {
     MysqlConfig: {
       host: 'localhost',
       port: 3306,
-      database: 'testdb',
+      database: 'infodb',
       user: 'chan',
       password: 'chan',  
     },
     DataStruct: {
       id: 'VARCHAR(255)',
       name: 'VARCHAR(255)',
-      file: 'VARACHAR(255)',
+      file: 'VARCHAR(255)',
       author: 'VARCHAR(255)',
       time: 'VARCHAR(255)',
       des: 'VARCHAR(255)',
     },
     Table1: 'ObjectInfo',
+    Reg: /\w*\+|\/|\'|\=|\"\w*/,
 ///-------------
 }

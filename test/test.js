@@ -1,7 +1,14 @@
 const objery = require('../routers/util/objery')
-const Koa = require('koa')
-const App = new Koa()
-App.use((ctx, next)=>{
-})
+const fieldscheck = require('../routers/util/fieldscheck').FieldsCheck
+
 const arr = ['da', 'fa', 'ga']
+const Obj = {
+    a: true,
+    b: false,
+}
+const cObj = {
+    b: 1,
+}
+const checker = new fieldscheck(Obj)
 console.log(objery.A2O(arr))
+console.log(checker.check(cObj))
