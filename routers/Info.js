@@ -39,7 +39,7 @@ const Insert = async(ctx, next) =>{
     for(let i = 0; i < IDList.length; i++)id = Math.max(id, IDList[i].id)
     id++
 
-    /// Check if filename exists
+    ///Check if filename exists
     const CheckFN = await pool.lgetdatabyID(AppConfig.Table1, 'file', 'file', FileName)
     if(CheckFN.length != 0){
         Res.status = 'Exists'
@@ -48,6 +48,13 @@ const Insert = async(ctx, next) =>{
         return
     }
 
+    ///Check if file allowed
+    if(!AllowTypes.includes(path.extname(FileName))){
+        Res.status = 'File Not Allow'
+        ctx.body = JSON.stringify(Res)
+        ctx.status = 200
+        return
+    } 
     const Info = {
         id: id,
         name: fields['name'],
