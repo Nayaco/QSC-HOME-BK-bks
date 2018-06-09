@@ -39,5 +39,13 @@ module.exports = {
     },
     Table1: 'ObjectInfo',
     Reg: /\w*\+|\/|\'|\=|\"\w*/,
-///-------------
-}
+
+///Login Configs
+    DataBaseConfig: {
+      host: 'localhost',
+      port: 3306,
+      database: 'infodb',
+      user: 'chan',
+      password: 'chan',
+    },
+}   

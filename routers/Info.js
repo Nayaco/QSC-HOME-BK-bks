@@ -36,7 +36,7 @@ const Insert = async(ctx, next) =>{
     const FileName = fields.file
     const IDList = await pool.lgetdata(AppConfig.Table1, 'id')
     let id = -1
-    for(let i = 0; i < IDList.length; i++)id = Math.max(id, IDList[i].id)
+    for(let i = 0; i < IDList.length; i++)id = Math.max(id, parseInt(IDList[i].id))
     id++
 
     ///Check if filename exists

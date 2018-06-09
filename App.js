@@ -29,11 +29,6 @@ App.use(async(ctx, next)=>{
     }
 })
 
-/*v_server.use(session({
-    key : 'USER_SID',
-    store: new Mysqlstorage(Mysqlconfig)
-}))*/
-
 App.use(koaBody({
     multipart: true,
 }))
@@ -42,6 +37,7 @@ App.use(Routers(KoaRouter))
 
 App.listen(AppConfig.ListenPort, ()=>
 console.log(`Port ${AppConfig.ListenPort} on listening`))
+
 ///................................................................
 ///Gangdou create a basic server with koa
 ///'GET /list'works and I finish the appendupload of 'POST /insert'.
@@ -55,3 +51,5 @@ console.log(`Port ${AppConfig.ListenPort} on listening`))
 ///...................201712101759................................
 ///Gangdou fix some bugs
 ///.................201712102139................................
+///Gangdou develop the backend
+///.................20180603...................................
